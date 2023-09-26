@@ -1,8 +1,9 @@
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/dcblogdev/laravel-dropbox.svg?style=flat-square)](https://packagist.org/packages/dcblogdev/laravel-dropbox)
-[![Total Downloads](https://img.shields.io/packagist/dt/dcblogdev/laravel-dropbox.svg?style=flat-square)](https://packagist.org/packages/dcblogdev/laravel-dropbox)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/racenationcc/laravel-dropbox.svg?style=flat-square)](https://packagist.org/packages/racenationcc/laravel-dropbox)
+[![Total Downloads](https://img.shields.io/packagist/dt/racenationcc/laravel-dropbox.svg?style=flat-square)](https://packagist.org/packages/racenationcc/laravel-dropbox)
 
 ![Logo](https://repository-images.githubusercontent.com/189828582/4defa980-49c1-11eb-9668-76f985726c80)
 
+**Forked from dcblogdev/laravel-dropbox**
 A Laravel package for working with Dropbox v2 API.
 
 Dropbox API documentation can be found at:
@@ -30,7 +31,7 @@ A common URL is https://domain.com/dropbox/connect
 Via Composer
 
 ```
-composer require dcblogdev/laravel-dropbox
+composer require racenationcc/laravel-dropbox
 ```
  
 ## Config
@@ -38,7 +39,7 @@ composer require dcblogdev/laravel-dropbox
 You can publish the config file with:
 
 ```
-php artisan vendor:publish --provider="Dcblogdev\Dropbox\DropboxServiceProvider" --tag="config"
+php artisan vendor:publish --provider="racenationcc\Dropbox\DropboxServiceProvider" --tag="config"
 ```
 
 When published, the config/dropbox.php config file contains, make sure to publish this file and change the scopes to match the scopes of your Dropbox app, inside Dropbox app console.
@@ -91,7 +92,7 @@ return [
 ## Migration
 You can publish the migration with:
 
-php artisan vendor:publish --provider="Dcblogdev\Dropbox\DropboxServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="racenationcc\Dropbox\DropboxServiceProvider" --tag="migrations"
 After the migration has been published you can create the tokens tables by running the migration:
 
 ```
@@ -201,7 +202,7 @@ Route::group(['middleware' => ['web', 'DropboxAuthenticated'], function()
 To access the token model reference this ORM model:
 
 ```php
-use Dcblogdev\Dropbox\Models\DropboxToken;
+use racenationcc\Dropbox\Models\DropboxToken;
 ```
 
 ## Files
@@ -213,7 +214,7 @@ To work with files first call ->files() followed by a method.
 Import Namespace
 
 ```php
-use Dcblogdev\Dropbox\Facades\Dropbox;
+use racenationcc\Dropbox\Facades\Dropbox;
 ```
 
 List Content
@@ -306,6 +307,6 @@ If you discover any security related issues, please email dave@dcblog.dev email 
 license. Please see the [license file][6] for more information.
 
 [3]:    changelog.md
-[4]:    https://github.com/dcblogdev/laravel-dropbox
+[4]:    https://github.com/racenationcc/laravel-dropbox
 [5]:    http://semver.org/
 [6]:    license.md
