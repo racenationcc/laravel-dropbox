@@ -6,12 +6,14 @@
         {
             "name": "David Carr",
             "email": "dave@dcblog.dev",
-            "homepage": "https://dcblog.dev"
+            "homepage": "https://dcblog.dev",
+            "role": "Source Developer"
         },
         {
             "name": "Carl Curtis",
             "email": "carl.curtis@race-nation.com",
-            "homepage": "https://race-nation.com"
+            "homepage": "https://race-nation.com",
+            "role": "Fork Developer"
         }
     ],
     "homepage": "https://github.com/racenationcc/laravel-dropbox",
