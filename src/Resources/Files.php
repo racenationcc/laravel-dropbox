@@ -11,7 +11,10 @@ use function trigger_error;
 
 class Files extends Dropbox
 {
-    public function __construct(protected bool $useRefreshToken = false)
+    public function __construct(
+        protected bool $useToken = false,
+        protected bool $useRefreshToken = false
+    )
     {
         parent::__construct();
     }
@@ -21,24 +24,36 @@ class Files extends Dropbox
         $pathRequest = $this->forceStartingSlash($path);
 
         return $this->post('files/list_folder', [
-            'path' => $path == '' ? '' : $pathRequest
+            'data' => [
+                'path' => $path == '' ? '' : $pathRequest
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
     }
 
     public function listContentsContinue($cursor = '')
     {
         return $this->post('files/list_folder/continue', [
-            'cursor' => $cursor
+            'data' => [
+                'cursor' => $cursor
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
     }
 
     public function move($fromPath, $toPath, $autoRename = false, $allowOwnershipTransfer = false)
     {
         $this->post('files/move_v2', [
-            "from_path" => $fromPath,
-            "to_path" => $toPath,
-            "autorename" => $autoRename,
-            "allow_ownership_transfer" => $allowOwnershipTransfer
+            'data' => [
+                "from_path" => $fromPath,
+                "to_path" => $toPath,
+                "autorename" => $autoRename,
+                "allow_ownership_transfer" => $allowOwnershipTransfer
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
     }
 
@@ -47,7 +62,11 @@ class Files extends Dropbox
         $path = $this->forceStartingSlash($path);
 
         return $this->post('files/delete_v2', [
-            'path' => $path
+            'data' => [
+                'path' => $path
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
     }
 
@@ -56,19 +75,56 @@ class Files extends Dropbox
         $path = $this->forceStartingSlash($path);
 
         return $this->post('files/create_folder', [
-            'path' => $path
+            'data' => [
+                'path' => $path,
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
     }
 
     public function search($query)
     {
         return $this->post('files/search', [
-            'path' => '',
-            'query' => $query,
-            'start' => 0,
-            'max_results' => 1000,
-            'mode' => 'filename'
+            'data' => [
+                'path' => '',
+                'query' => $query,
+                'start' => 0,
+                'max_results' => 1000,
+                'mode' => 'filename'
+            ],
+            'useToken' => $this->useToken,
+            'useConfigRefreshToken' => $this->useRefreshToken
         ]);
+    }
+
+    public function doesFileExist(string $path): bool
+    {
+        $path = $this->forceStartingSlash($path);
+
+        try {
+
+            $ch = curl_init('https://api.dropboxapi.com/2/files/get_metadata');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $this->getAccessToken($this->useRefreshToken),
+                'Content-Type: application/json',
+            ]);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['path' => $path]));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            $responseData = json_decode($response);
+
+            return isset($responseData->id);
+
+        } catch (Exception $e) {
+
+            throw new Exception($e->getMessage());
+
+        }
+
     }
 
     public function upload($path, $uploadPath, $mode = 'add')
@@ -197,4 +253,5 @@ class Files extends Dropbox
     {
         return file_get_contents($filePath);
     }
+
 }

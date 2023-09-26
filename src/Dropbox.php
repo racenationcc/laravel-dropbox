@@ -20,9 +20,9 @@ class Dropbox
     {
     }
 
-    public function files($useConfigRefreshToken = false)
+    public function files($useToken = false, $useConfigRefreshToken = false)
     {
-        return new Files($useConfigRefreshToken);
+        return new Files($useToken, $useConfigRefreshToken);
     }
 
     protected function forceStartingSlash($string)
@@ -42,15 +42,18 @@ class Dropbox
      */
     public function __call($function, $args)
     {
+
         $options = ['get', 'post', 'patch', 'put', 'delete'];
-        $path = (isset($args[0])) ? $args[0] : null;
-        $data = (isset($args[1])) ? $args[1] : null;
-        $customHeaders = (isset($args[2])) ? $args[2] : null;
-        $useToken = (isset($args[3])) ? $args[3] : true;
-        $useConfigRefreshToken = (isset($args[4])) ? $args[4] : true;
+        
+        list($requestPath, $requestData) = $args;
+
+        $data = $requestData['data'] ?? null;
+        $customHeaders = $requestData['headers'] ?? null;
+        $useToken = $requestData['useToken'] ?? null;
+        $useConfigRefreshToken = $requestData['useConfigRefreshToken'] ?? null;
 
         if (in_array($function, $options)) {
-            return self::guzzle($function, $path, $data, $customHeaders, $useToken, $useConfigRefreshToken);
+            return self::guzzle($function, $requestPath, $data, $customHeaders, $useToken, $useConfigRefreshToken);
         } else {
             //request verb is not in the $options array
             throw new Exception($function . ' is not a valid HTTP Verb');
@@ -275,7 +278,9 @@ class Dropbox
      * @param  $type string
      * @param  $request string
      * @param  $data array
-     * @param  $id integer
+     * @param  $customHeaders array
+     * @param  $useToken bool
+     * @param  $useConfigRefreshToken bool
      * @return json object
      */
     protected function guzzle($type, $request, $data = [], $customHeaders = null, $useToken = true, $useConfigRefreshToken = false)
@@ -303,10 +308,15 @@ class Dropbox
             ]);
 
             return json_decode($response->getBody()->getContents(), true);
+
         } catch (ClientException $e) {
+
             throw new Exception($e->getResponse()->getBody()->getContents());
+
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+
+            throw new Exception($e->getMessage()); 
+            
         }
     }
 
