@@ -1,5 +1,5 @@
 {
-    "name": "dcblogdev/laravel-dropbox",
+    "name": "racenationcc/laravel-dropbox",
     "description": "A Laravel Dropbox v2 package",
     "license": "MIT",
     "authors": [
@@ -22,16 +22,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Dcblogdev\\Dropbox\\": "src/"
+            "RaceNation\\Dropbox\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Dcblogdev\\Dropbox\\DropboxServiceProvider"
+                "RaceNation\\Dropbox\\DropboxServiceProvider"
             ],
             "aliases": {
-                "Dropbox": "Dcblogdev\\Dropbox\\Facades\\Dropbox"
+                "Dropbox": "RaceNation\\Dropbox\\Facades\\Dropbox"
             }
         }
     }
