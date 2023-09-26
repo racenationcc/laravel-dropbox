@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcblogdev\Dropbox\Facades;
+namespace RaceNation\Dropbox\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

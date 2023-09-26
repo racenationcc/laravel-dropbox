@@ -1,6 +1,6 @@
 <?php
 
-namespace Dcblogdev\Dropbox\Models;
+namespace RaceNation\Dropbox\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Dcblogdev\Dropbox\Resources;
+namespace RaceNation\Dropbox\Resources;
 
-use Dcblogdev\Dropbox\Dropbox;
+use RaceNation\Dropbox\Dropbox;
 use GuzzleHttp\Client;
 use Exception;
 
