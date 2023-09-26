@@ -87,11 +87,11 @@ class Files extends Dropbox
     }
 
     //upload a stream of data to custom filename
-    public function uploadStream(string $uploadLocation, string $fileName, string $fileContents, string $mode)
+    public function uploadStream(string $path, string $fileName, string $fileContents, string $mode)
     {
-
+        $path = ($path !== '') ? $this->forceStartingSlash($path) : '';
         //strip trailing slash from uploadLocation if they have it as we're putting there
-        return $this->uploadCurl(rtrim($uploadLocation, '/') . '/' . $fileName, $fileContents, $mode);
+        return $this->uploadCurl(rtrim($path, '/') . '/' . $fileName, $fileContents, $mode);
 
     }
 
