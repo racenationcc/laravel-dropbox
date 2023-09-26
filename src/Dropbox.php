@@ -16,7 +16,7 @@ class Dropbox
     protected static $authorizeUrl = 'https://www.dropbox.com/oauth2/authorize';
     protected static $tokenUrl = 'https://api.dropbox.com/oauth2/token';
 
-    public function __construct()
+    public function __construct(protected bool $useRefreshToken = false)
     {
     }
 
@@ -152,6 +152,16 @@ class Dropbox
             return config('dropbox.accessToken');
         }
 
+        if($this->useRefreshToken){
+            if(config('dropbox.refeshToken') !== ''){
+                return $this->refreshAccessToken(config('dropbox.refreshToken'))['access_token'];
+            }else{
+                //refresh token missing return null
+                return null;
+            }
+        }
+
+
         //use id if passed otherwise use logged in user
         $id    = auth()->id();
         $token = DropboxToken::where('user_id', $id)->first();
@@ -192,6 +202,26 @@ class Dropbox
 
         // Token is still valid, just return it
         return $token->access_token;
+    }
+
+    /**
+     * Return authenticated access token or request new token when expired
+     * @param  $refreshToken string - refresh token for account
+     * @return return string access token
+     */
+    public function refreshAccessToken($refreshToken)
+    {
+
+        // Token is expired (or very close to it) so let's refresh
+        $params = [
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'client_id'     => config('dropbox.clientId'),
+            'client_secret' => config('dropbox.clientSecret')
+        ];
+
+        return  $this->dopost(self::$tokenUrl, $params);
+
     }
 
     /**
