@@ -82,6 +82,21 @@ class Files extends Dropbox
         $filename = $this->getFilenameFromPath($uploadPath);
         $path     = $path.$filename;
 
+        return $this->uploadCurl($path, $contents, $mode);
+
+    }
+
+    //upload a stream of data to custom filename
+    public function uploadStream(string $uploadLocation, string $fileName, string $fileContents, string $mode)
+    {
+
+        //strip trailing slash from uploadLocation if they have it as we're putting there
+        return $this->uploadCurl(rtrim($uploadLocation, '/') . '/' . $fileName, $fileContents, $mode);
+
+    }
+
+    protected function uploadCurl(string $pathWithFileName, string $fileContents, string $mode)
+    {
         try {
 
             $ch = curl_init('https://content.dropboxapi.com/2/files/upload');
@@ -90,14 +105,14 @@ class Files extends Dropbox
                 'Content-Type: application/octet-stream',
                 'Dropbox-API-Arg: ' .
                     json_encode([
-                        "path" => $path,
+                        "path" => $pathWithFileName,
                         "mode" => $mode,
                         "autorename" => true,
                         "mute" => false
                     ])
             ]);
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $contents);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $fileContents);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($ch);
             curl_close($ch);
