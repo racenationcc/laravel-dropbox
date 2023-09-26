@@ -11,7 +11,7 @@ use function trigger_error;
 
 class Files extends Dropbox
 {
-    public function __construct()
+    public function __construct(protected bool $useRefreshToken = false)
     {
         parent::__construct();
     }
@@ -101,7 +101,7 @@ class Files extends Dropbox
 
             $ch = curl_init('https://content.dropboxapi.com/2/files/upload');
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: Bearer ' . $this->getAccessToken(),
+                'Authorization: Bearer ' . $this->getAccessToken($this->useRefreshToken),
                 'Content-Type: application/octet-stream',
                 'Dropbox-API-Arg: ' .
                     json_encode([
@@ -132,7 +132,7 @@ class Files extends Dropbox
 
             $response = $client->post("https://content.dropboxapi.com/2/files/download", [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getAccessToken(),
+                    'Authorization' => 'Bearer ' . $this->getAccessToken($this->useRefreshToken),
                     'Dropbox-API-Arg' => json_encode([
                         'path' => $path
                     ])
@@ -170,7 +170,7 @@ class Files extends Dropbox
 
             $response = $client->post("https://content.dropboxapi.com/2/files/download", [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getAccessToken(),
+                    'Authorization' => 'Bearer ' . $this->getAccessToken($this->useRefreshToken),
                     'Dropbox-API-Arg' => json_encode([
                                                          'path' => $path
                                                      ])

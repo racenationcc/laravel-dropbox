@@ -16,13 +16,13 @@ class Dropbox
     protected static $authorizeUrl = 'https://www.dropbox.com/oauth2/authorize';
     protected static $tokenUrl = 'https://api.dropbox.com/oauth2/token';
 
-    public function __construct(protected bool $useRefreshToken = false)
+    public function __construct()
     {
     }
 
-    public function files()
+    public function files($useConfigRefreshToken = false)
     {
-        return new Files();
+        return new Files($useConfigRefreshToken);
     }
 
     protected function forceStartingSlash($string)
@@ -47,9 +47,10 @@ class Dropbox
         $data = (isset($args[1])) ? $args[1] : null;
         $customHeaders = (isset($args[2])) ? $args[2] : null;
         $useToken = (isset($args[3])) ? $args[3] : true;
+        $useConfigRefreshToken = (isset($args[4])) ? $args[4] : true;
 
         if (in_array($function, $options)) {
-            return self::guzzle($function, $path, $data, $customHeaders, $useToken);
+            return self::guzzle($function, $path, $data, $customHeaders, $useToken, $useConfigRefreshToken);
         } else {
             //request verb is not in the $options array
             throw new Exception($function . ' is not a valid HTTP Verb');
@@ -145,14 +146,14 @@ class Dropbox
      * @param  $returnNullNoAccessToken null when set to true return null
      * @return return string access token
      */
-    public function getAccessToken($returnNullNoAccessToken = null)
+    public function getAccessToken($useConfigRefreshToken = false, $returnNullNoAccessToken = null)
     {
         //use token from .env if exists
         if (config('dropbox.accessToken') !== '') {
             return config('dropbox.accessToken');
         }
 
-        if($this->useRefreshToken){
+        if($useConfigRefreshToken){
             if(config('dropbox.refeshToken') !== ''){
                 return $this->refreshAccessToken(config('dropbox.refreshToken'))['access_token'];
             }else{
@@ -277,7 +278,7 @@ class Dropbox
      * @param  $id integer
      * @return json object
      */
-    protected function guzzle($type, $request, $data = [], $customHeaders = null, $useToken = true)
+    protected function guzzle($type, $request, $data = [], $customHeaders = null, $useToken = true, $useConfigRefreshToken = false)
     {
         try {
             $client = new Client;
@@ -287,7 +288,7 @@ class Dropbox
             ];
 
             if ($useToken == true) {
-                $headers['Authorization'] = 'Bearer ' . $this->getAccessToken();
+                $headers['Authorization'] = 'Bearer ' . $this->getAccessToken($useConfigRefreshToken);
             }
 
             if ($customHeaders !== null) {
