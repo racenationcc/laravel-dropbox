@@ -25,12 +25,16 @@ class Dropbox
         return new Files($useToken, $useConfigRefreshToken);
     }
 
+    protected function addRootFolderToPath(string $path): string
+    {
+        return config('dropbox.rootFolder').$this->forceStartingSlash($path);
+    }
+
     protected function forceStartingSlash($string)
     {
         if (substr($string, 0, 1) !== "/") {
             $string = "/$string";
         }
-
         return $string;
     }
 

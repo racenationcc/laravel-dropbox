@@ -21,7 +21,7 @@ class Files extends Dropbox
 
     public function listContents($path = '')
     {
-        $pathRequest = $this->forceStartingSlash($path);
+        $pathRequest = $this->addRootFolderToPath($path);
 
         return $this->post('files/list_folder', [
             'data' => [
@@ -59,7 +59,7 @@ class Files extends Dropbox
 
     public function delete($path)
     {
-        $path = $this->forceStartingSlash($path);
+        $path = $this->addRootFolderToPath($path);
 
         return $this->post('files/delete_v2', [
             'data' => [
@@ -72,7 +72,7 @@ class Files extends Dropbox
 
     public function createFolder($path)
     {
-        $path = $this->forceStartingSlash($path);
+        $path = $this->addRootFolderToPath($path);
 
         return $this->post('files/create_folder', [
             'data' => [
@@ -100,7 +100,7 @@ class Files extends Dropbox
 
     public function doesFileExist(string $path): bool
     {
-        $path = $this->forceStartingSlash($path);
+        $path = $this->addRootFolderToPath($path);
 
         try {
 
@@ -133,7 +133,7 @@ class Files extends Dropbox
             throw new Exception('File is required');
         }
 
-	    $path     = ($path !== '') ? $this->forceStartingSlash($path) : '';
+	    $path     = ($path !== '') ? $this->addRootFolderToPath($path) : '';
 	    $contents = $this->getContents($uploadPath);
         $filename = $this->getFilenameFromPath($uploadPath);
         $path     = $path.$filename;
@@ -145,7 +145,7 @@ class Files extends Dropbox
     //upload a stream of data to custom filename
     public function uploadStream(string $path, string $fileName, string $fileContents, string $mode)
     {
-        $path = ($path !== '') ? $this->forceStartingSlash($path) : '';
+        $path = ($path !== '') ? $this->addRootFolderToPath($path) : '';
         //strip trailing slash from uploadLocation if they have it as we're putting there
         return $this->uploadCurl(rtrim($path, '/') . '/' . $fileName, $fileContents, $mode);
 
@@ -181,7 +181,7 @@ class Files extends Dropbox
 
     public function download($path, $destFolder = '')
     {
-        $path = $this->forceStartingSlash($path);
+        $path = $this->addRootFolderToPath($path);
 
         try {
             $client = new Client;
@@ -219,7 +219,7 @@ class Files extends Dropbox
 
     public function getContentsFile($path)
     {
-        $path = $this->forceStartingSlash($path);
+        $path = $this->addRootFolderToPath($path);
 
         try {
             $client = new Client;
@@ -246,7 +246,7 @@ class Files extends Dropbox
     {
         $parts = explode('/', $filePath);
         $filename = end($parts);
-        return $this->forceStartingSlash($filename);
+        return $this->addRootFolderToPath($filename);
     }
 
     protected function getContents($filePath)

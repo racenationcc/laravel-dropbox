@@ -5,12 +5,12 @@ return [
     /*
     * set the client id
     */
-    'clientId' => env('DROPBOX_CLIENT_ID'),
+    'clientId' => env('DROPBOX_APP_KEY'),
 
     /*
     * set the client secret
     */
-    'clientSecret' => env('DROPBOX_SECRET_ID'),
+    'clientSecret' => env('DROPBOX_APP_SECRET'),
 
     /*
     * Set the url to trigger the oauth process this url should call return Dropbox::connect();
@@ -25,10 +25,15 @@ return [
     /**
      * Set access token, when set will bypass the oauth2 process
      */
-    'accessToken' => env('DROPBOX_ACCESS_TOKEN', ''),
+    'accessToken' => env('DROPBOX_AUTH_TOKEN', ''),
 
     /**
-     * Set refesh token, used to get a new access token
+     * The root folder of where the dropbox API will write too
+     */
+    'rootFolder' => env('DROPBOX_ROOT_FOLDER', '/'),
+
+    /**
+     * Set access token, when set will bypass the oauth2 process
      */
     'refreshToken' => env('DROPBOX_REFRESH_TOKEN', ''),
 
