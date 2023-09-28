@@ -4,6 +4,7 @@
 ![Logo](https://repository-images.githubusercontent.com/189828582/4defa980-49c1-11eb-9668-76f985726c80)
 
 **Forked from dcblogdev/laravel-dropbox**
+
 A Laravel package for working with Dropbox v2 API.
 
 Dropbox API documentation can be found at:
@@ -72,7 +73,17 @@ return [
     /**
      * Set access token, when set will bypass the oauth2 process
      */
+    'refreshToken' => env('DROPBOX_REFRESH_TOKEN', ''),
+
+    /**
+     * Set access token, when set will bypass the oauth2 process
+     */
     'accessToken' => env('DROPBOX_ACCESS_TOKEN', ''),
+
+    /**
+     * The root folder of where the dropbox API will write too
+     */
+    'rootFolder' => env('DROPBOX_ROOT_FOLDER', '/'),
 
     /**
      * Set access type, options are offline and online
@@ -110,12 +121,36 @@ DROPBOX_LANDING_URL=https://domain.com/dropbox
 DROPBOX_ACCESS_TYPE=offline
 ```
 
-Bypass Oauth2
-You can bypass the oauth2 process by generating an access token in your dropbox app and entering it on the .env file:
+**Bypassing Oauth2** - Short Term
+
+You can bypass the oauth2 process by generating an access token, Dropbox no longer issue long term Access Tokens, however the following method is useful to quickley test permission changes on your app.
+
+After generating the the access token on your App page enter it in the .env file:
 
 ```
 DROPBOX_ACCESS_TOKEN=
 ```
+
+**Bypassing Oauth2** - Long Term
+
+To bypass Oauth long term you can save your refresh token. The methods have arguments to force them to use this to get a new access token, (currently this gets a new access token for each request). 
+
+To generate a refresh token:
+1. Go to the authorization url replacing {APPKEY} with your own https://www.dropbox.com/oauth2/authorize?client_id={APPKEY}&response_type=code&token_access_type=offline
+2. Sign in and copy the authorization code
+3. Exchange the authorization code for an access token and refresh token using Curl replacing {AUTHCODE}, {APPKEY} and {APPSECRET} with their respective values
+```
+curl https://api.dropbox.com/oauth2/token \
+    -d code={AUTHCODE} \
+    -d grant_type=authorization_code \
+    -u {APPKEY}:{APPSECRET}
+```
+4. Take the refresh token from the reponse and save it to your .env file:
+
+```
+DROPBOX_REFRESH_TOKEN=
+```
+*Note - Any access token generating from the refresh token will have the scope(s) the app had at the time this refresh token was generated, if you change the app's scope(s) you will need to generate a new refresh token.*
 
 ## Usage
 Note this package expects a user to be logged in.
@@ -217,7 +252,15 @@ Import Namespace
 use racenationcc\Dropbox\Facades\Dropbox;
 ```
 
-List Content
+**Check File Exists**
+
+returns true or false
+
+```php
+Dropbox::files()->doesFileExist($path = '')
+```
+
+**List Content**
 
 list files and folders of a given path
 
@@ -225,7 +268,7 @@ list files and folders of a given path
 Dropbox::files()->listContents($path = '')
 ```
 
-List Content Continue
+**List Content Continue**
 
 Using a cursor from the previous listContents call to paginate over the next set of folders/files.
 
@@ -233,42 +276,55 @@ Using a cursor from the previous listContents call to paginate over the next set
 Dropbox::files()->listContentsContinue($cursor = '')
 ```
 
-Delete folder/file
+**Delete folder/file**
+
 Pass the path to the file/folder, When delting a folder all child items will be deleted.
 
 ```php
 Dropbox::files()->delete($path)
 ```
 
-Create Folder
+**Create Folder**
 Pass the path to the folder to be created.
 
 ```php
 Dropbox::files()->createFolder($path)
 ```
 
-Search Files
+**Search Files**
+
 Each word will used to search for files.
 
 ```php
 Dropbox::files()->search($query)
 ```
 
-Upload File
+**Upload File**
+
 Upload files to Dropbox by passing the folder path followed by the filename. Note this method supports uploads up to 150MB only.
 
 ```php
 Dropbox::files()->upload($path, $file)
 ```
 
-Download File
+**Upload Stream**
+
+Upload a stream of data as a file. Note this method supports uploads up to 150MB only.
+
+```php
+Dropbox::files()->uploadStream($path, $fileName, $fileContents)
+```
+
+**Download File**
+
 Download file from Dropbox by passing the folder path including the file.
 
 ```php
 Dropbox::files()->download($path)
 ```
 
-Move Folder/File
+**Move Folder/File**
+
 Move accepts 4 params:
 
 $fromPath - provide the path for the existing folder/file
@@ -280,33 +336,12 @@ $allowOwnershipTransfer - Allow moves by owner even if it would result in an own
 Dropbox::files()->move($fromPath, $toPath, $autoRename = false, $allowOwnershipTransfer = false);
 ```
 
-## Change log
+## Thanks
 
-Please see the [changelog][3] for more information on what has changed recently.
+To author original repo dcblogdev/laravel-dropbox from which this is fork dave@dcblog.dev
 
 ## Contributing
 
 Contributions are welcome and will be fully credited.
 
-Contributions are accepted via Pull Requests on [Github][4].
-
-## Pull Requests
-
-- **Document any change in behaviour** - Make sure the `readme.md` and any other relevant documentation are kept up-to-date.
-
-- **Consider our release cycle** - We try to follow [SemVer v2.0.0][5]. Randomly breaking public APIs is not an option.
-
-- **One pull request per feature** - If you want to do more than one thing, send multiple pull requests.
-
-## Security
-
-If you discover any security related issues, please email dave@dcblog.dev email instead of using the issue tracker.
-
-## License
-
-license. Please see the [license file][6] for more information.
-
-[3]:    changelog.md
-[4]:    https://github.com/racenationcc/laravel-dropbox
-[5]:    http://semver.org/
-[6]:    license.md
+Contributions are accepted via Pull Requests on Github https://github.com/racenationcc/laravel-dropbox
